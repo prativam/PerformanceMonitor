@@ -16,4 +16,42 @@ router.post("/import", async (req, res) => {
     }
 });
 
+router.get("/analytics", async (req, res) => {
+    try {
+        
+        var dateArr  = req.query.date.split(',')
+        let metric = req.query.metric
+        let Aggr = req.query.Aggr
+       
+        var data = await  Performance.find({ 'CounterName':metric}).exec()
+        var data = await  Performance.find({ 'CounterName':metric, 'date': {
+                $gte: dateArr[0],
+               $lte: dateArr[1]
+             } }).exec()
+        res.status(200).send(data)
+    } catch (err) {
+        console.error(err)
+        res.status(500).send('Invalid Data')
+    }
+})
+
+router.get("/badperformance", async (req, res) => {
+    try {
+        
+        var dateArr  = req.query.date.split(',')
+        let metric = req.query.metric
+        let p90 = req.query.p90
+       
+        var data = await  Performance.find({ 'CounterName':metric}).exec()
+        var data = await  Performance.find({ 'CounterName':metric, 'date': {
+                $gte: dateArr[0],
+               $lte: dateArr[1]
+             },
+             'P90':{$gte : p90 }}).exec()
+        res.status(200).send(data)
+    } catch (err) {
+        console.error(err)
+        res.status(500).send('Invalid Data')
+    }
+})
 module.exports = router
